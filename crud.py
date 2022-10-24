@@ -60,9 +60,8 @@ def ivesti_studenta():
     asm_kodas = e_asmens_kodas.get()
     el_pastas = e_el_pastas.get()
     mobilus = e_mobilus.get()
-    mokykla_id = pasirinkta_mokykla.get()
-    studijos = pasirinktos_studijos.get()
-    studijos_id = studijos.id
+    mokykla_id = int(pasirinkta_mokykla.get().split(',')[0])
+    studijos_id = int(pasirinktos_studijos.get().split(',')[0])
     studentas = Studentas(
         vardas=vardas, 
         pavarde=pavarde, 
@@ -129,23 +128,31 @@ def redaguoti_studenta():
 
 #cruD
 def istrinti_mokykla():
-    pazymeta_mokykla = boxas.curselection()[0]
-    # mokykla = session.query(Mokykla).get(pazymeta_mokykla)
-    # session.delete(mokykla)
-    # session.commit()
-    print(pazymeta_mokykla)
+    pazymeta_mokykla = mokyklu_listas()[boxas.curselection()[0]]
+    mokykla = session.query(Mokykla).get(pazymeta_mokykla.id)
+    session.delete(mokykla)
+    session.commit()
+    boxas.delete(0, END)
+    boxas.insert(END, *mokyklu_listas())
+    l_mokykla_rezultatas["text"] = f"{pazymeta_mokykla.pavadinimas} ištrinta"
 
 def istrinti_studijas():
-    pazymetos_studijos = boxas.curselection()[0]
-    studijos = session.query(Studijos).get(pazymetos_studijos)
+    pazymetos_studijos = studiju_listas()[boxas.curselection()[0]]
+    studijos = session.query(Studijos).get(pazymetos_studijos.id)
     session.delete(studijos)
     session.commit()
+    boxas.delete(0, END)
+    boxas.insert(END, *studiju_listas())
+    l_studijos_rezultatas["text"] = f"{pazymetos_studijos.programos_pavadinimas} ištrinta"
 
 def istrinti_studenta():
-    pazymetas_studentas = boxas.curselection()[0]
-    studentas = session.query(Studentas).get(pazymetas_studentas)
+    pazymetas_studentas = studentu_listas()[boxas.curselection()[0]]
+    studentas = session.query(Studentas).get(pazymetas_studentas.id)
     session.delete(studentas)
     session.commit()
+    boxas.delete(0, END)
+    boxas.insert(END, *studentu_listas())
+    l_studentas_rezultatas["text"] = f"{pazymetas_studentas.vardas} {pazymetas_studentas.pavarde} ištrintas"
 
 # Labels
 l_tuscias_e0_s0 = Label(langas, text="")
@@ -209,19 +216,19 @@ b_istrinti_studenta = Button(langas, text="Ištrinti", command=istrinti_studenta
 # combobox
 mokyklos_pasirinkimas = session.query(Mokykla).all()
 pasirinkta_mokykla = StringVar()
-pasirinkta_mokykla.set(mokyklos_pasirinkimas[0])
 
 mokyklos_comboboxas = ttk.Combobox(langas, values=mokyklos_pasirinkimas)
-mokyklos_comboboxas.current(0)
+# mokyklos_comboboxas.current()
+pasirinkta_mokykla.set(mokyklos_comboboxas.current())
 mokyklos_comboboxas.bind("<<ComboboxSelected>>")
 mokyklos_comboboxas.grid(row=22, column=2, ipadx=70)
 
 studiju_pasirinkimas = session.query(Studijos).all()
 pasirinktos_studijos = StringVar()
-pasirinktos_studijos.set(studiju_pasirinkimas[0])
 
 studiju_comboboxas = ttk.Combobox(langas, values=studiju_pasirinkimas)
-studiju_comboboxas.current(0)
+# studiju_comboboxas.current()
+pasirinktos_studijos.set(studiju_comboboxas.current())
 studiju_comboboxas.bind("<<ComboboxSelected>>")
 studiju_comboboxas.grid(row=23, column=2, ipadx=70)
 
