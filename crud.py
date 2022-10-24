@@ -13,29 +13,111 @@ session = sessionmaker(bind=engine)()
 
 #Crud
 def ivesti_mokykla():
-    pass
+    pavadinimas = e_pavadinimas.get()
+    imones_kodas = int(e_imones_kodas.get())
+    pvm_kodas = e_pvm_kodas.get()
+    adresas = e_adresas.get()
+    mokykla = Mokykla(pavadinimas=pavadinimas, imones_kodas=imones_kodas, pvm_kodas=pvm_kodas, adresas=adresas)
+    session.add(mokykla)
+    session.commit()
+    l_mokykla_rezultatas["text"] = mokykla
+    atnaujinti_mokyklos_laukus()
+
+def mokyklu_listas():
+    return session.query(Mokykla).all()
+
+def atnaujinti_mokyklos_laukus():
+    boxas.delete(0, END)
+    boxas.insert(END, *mokyklu_listas())
+    e_pavadinimas.delete(0, END)
+    e_imones_kodas.delete(0, END)
+    e_pvm_kodas.delete(0, END)
+    e_adresas.delete(0, END)
 
 def ivesti_studijas():
-    pass
+    programos_pavadinimas = e_programa.get()
+    trukme = e_trukme.get()
+    kaina = float(e_kaina.get())
+    studijos = Studijos(programos_pavadinimas=programos_pavadinimas, trukme=trukme, kaina=kaina)
+    session.add(studijos)
+    session.commit()
+    l_studijos_rezultatas["text"] = studijos
+    atnaujinti_studijos_laukus()
+
+def studiju_listas():
+    return session.query(Studijos).all()
+
+def atnaujinti_studijos_laukus():
+    boxas.delete(0, END)
+    boxas.insert(END, *studiju_listas())
+    e_programa.delete(0, END)
+    e_trukme.delete(0, END)
+    e_kaina.delete(0, END)
 
 def ivesti_studenta():
-    pass
+    vardas = e_vardas.get()
+    pavarde = e_pavarde.get()
+    asm_kodas = e_asmens_kodas.get()
+    el_pastas = e_el_pastas.get()
+    mobilus = e_mobilus.get()
+    mokykla_id = pasirinkta_mokykla.get()
+    studijos = pasirinktos_studijos.get()
+    studijos_id = studijos.id
+    studentas = Studentas(
+        vardas=vardas, 
+        pavarde=pavarde, 
+        asm_kodas=asm_kodas, 
+        el_pastas=el_pastas,
+        mobilus=mobilus,
+        mokykla_id=mokykla_id,
+        studijos_id=studijos_id
+    )
+    session.add(studentas)
+    session.commit()
+    l_studentas_rezultatas["text"] = studentas
+    atnaujinti_studento_laukus()
 
-def atnaujinti_laukus():
-    pass
+def studentu_listas():
+    return session.query(Studentas).all()
+
+def atnaujinti_studento_laukus():
+    boxas.delete(0, END)
+    boxas.insert(END, *studentu_listas())
+    e_vardas.delete(0, END)
+    e_pavarde.delete(0, END)
+    e_asmens_kodas.delete(0, END)
+    e_el_pastas.delete(0, END)
+    e_mobilus.delete(0, END)
 
 #cRud
 def perziureti_mokyklas():
-    pass
+    boxas.delete(0, END)
+    boxas.insert(END, *mokyklu_listas())
 
 def perziureti_studijas():
-    pass
+    boxas.delete(0, END)
+    boxas.insert(END, *studiju_listas())
+
+def gauti_visus_studentus():
+    studentu_sarasas = []
+    studentai = session.query(Studentas).all()
+    for studentas in studentai:
+        studentu_sarasas.append(
+            (studentas.vardas,
+             studentas.pavarde,
+              studentas.mokykla_id,
+               studentas.studijos_id)
+        )
+    for studentas in studentu_sarasas:
+        return studentas
 
 def perziureti_studentus():
-    pass
+    boxas.delete(0, END)
+    boxas.insert(END, *studentu_listas())
+    tree.delete(*tree.get_children())
+    tree.insert('', END, values=gauti_visus_studentus())
 
 #crUd
-
 def redaguoti_mokykla():
     pass
 
@@ -46,15 +128,24 @@ def redaguoti_studenta():
     pass
 
 #cruD
-
 def istrinti_mokykla():
-    pass
+    pazymeta_mokykla = boxas.curselection()[0]
+    # mokykla = session.query(Mokykla).get(pazymeta_mokykla)
+    # session.delete(mokykla)
+    # session.commit()
+    print(pazymeta_mokykla)
 
 def istrinti_studijas():
-    pass
+    pazymetos_studijos = boxas.curselection()[0]
+    studijos = session.query(Studijos).get(pazymetos_studijos)
+    session.delete(studijos)
+    session.commit()
 
 def istrinti_studenta():
-    pass
+    pazymetas_studentas = boxas.curselection()[0]
+    studentas = session.query(Studentas).get(pazymetas_studentas)
+    session.delete(studentas)
+    session.commit()
 
 # Labels
 l_tuscias_e0_s0 = Label(langas, text="")
@@ -67,14 +158,14 @@ l_imones_kodas = Label(langas, text="Įmonės kodas")
 l_pvm_kodas = Label(langas, text="PVM kodas")
 l_adresas = Label(langas, text="Adresas")
 l_tuscias_pries_mokykla = Label(langas, text="")
-l_mokykla_rezultatas = Label(langas, text="", bd=2, relief=SUNKEN, anchor=W, bg='white')
+l_mokykla_rezultatas = Label(langas, text="", bd=2, relief=SUNKEN, bg='white')
 l_tuscias_po_mokykla = Label(langas, text="")
 l_ivesti_studijas = Label(langas, text="Įvesti studijų programą:")
 l_programa = Label(langas, text="Programa")
 l_trukme = Label(langas, text="Trukmė")
 l_kaina = Label(langas, text="Kaina")
 l_tuscias_pries_studijos = Label(langas, text="")
-l_studijos_rezultatas = Label(langas, text="", bd=2, relief=SUNKEN, anchor=W, bg='white')
+l_studijos_rezultatas = Label(langas, text="", bd=2, relief=SUNKEN, bg='white')
 l_tuscias_po_studijos = Label(langas, text="")
 l_ivesti_studenta = Label(langas, text="Įvesti studentą:")
 l_vardas = Label(langas, text="Vardas")
@@ -85,7 +176,7 @@ l_mobilus = Label(langas, text="Mobilus tel. nr.")
 l_mokykla = Label(langas, text="Mokymo įstaiga")
 l_studijos = Label(langas, text="Studijos")
 l_tuscias_pries_studentas = Label(langas, text="")
-l_studentas_rezultatas = Label(langas, text="", bd=2, relief=SUNKEN, anchor=W, bg='white')
+l_studentas_rezultatas = Label(langas, text="", bd=2, relief=SUNKEN, bg='white')
 l_tuscias_po_studentas = Label(langas, text="")
 
 # Entries
@@ -114,6 +205,25 @@ b_istrinti_studijas = Button(langas, text="Ištrinti", command=istrinti_studijas
 b_ivesti_studenta = Button(langas, text="Įrašyti", command=ivesti_studenta)
 b_redaguoti_studenta = Button(langas, text="Redaguoti", command=redaguoti_studenta)
 b_istrinti_studenta = Button(langas, text="Ištrinti", command=istrinti_studenta)
+
+# combobox
+mokyklos_pasirinkimas = session.query(Mokykla).all()
+pasirinkta_mokykla = StringVar()
+pasirinkta_mokykla.set(mokyklos_pasirinkimas[0])
+
+mokyklos_comboboxas = ttk.Combobox(langas, values=mokyklos_pasirinkimas)
+mokyklos_comboboxas.current(0)
+mokyklos_comboboxas.bind("<<ComboboxSelected>>")
+mokyklos_comboboxas.grid(row=22, column=2, ipadx=70)
+
+studiju_pasirinkimas = session.query(Studijos).all()
+pasirinktos_studijos = StringVar()
+pasirinktos_studijos.set(studiju_pasirinkimas[0])
+
+studiju_comboboxas = ttk.Combobox(langas, values=studiju_pasirinkimas)
+studiju_comboboxas.current(0)
+studiju_comboboxas.bind("<<ComboboxSelected>>")
+studiju_comboboxas.grid(row=23, column=2, ipadx=70)
 
 # listbox
 boxo_scrollbaras = Scrollbar(langas)
@@ -192,8 +302,8 @@ e_pavarde.grid(row=18, column=2, ipadx=80)
 e_asmens_kodas.grid(row=19, column=2, ipadx=80)
 e_el_pastas.grid(row=20, column=2, ipadx=80)
 e_mobilus.grid(row=21, column=2, ipadx=80)
-e_mokykla.grid(row=22, column=2, ipadx=80)
-e_studijos.grid(row=23, column=2, ipadx=80)
+# e_mokykla.grid(row=22, column=2, ipadx=80)
+# e_studijos.grid(row=23, column=2, ipadx=80)
 
 # grids for buttons
 b_ivesti_mokykla.grid(row=2, column=4, sticky=W+E)
