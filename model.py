@@ -10,7 +10,7 @@ class Mokykla(Base):
     id = Column(Integer, primary_key=True)
     pavadinimas = Column("pavadinimas", String)
     imones_kodas = Column("imones_kodas", Integer, unique=True, nullable=False)
-    pvm_kodas = Column("pvm_kodas", String, unique=True)
+    pvm_kodas = Column("pvm_kodas", String, unique=True, nullable=True)
     adresas = Column("adresas", String)
     studentai = relationship("Studentas", back_populates="mokyklos")
 
@@ -46,4 +46,5 @@ class Studentas(Base):
 
 
 if __name__ == "__main__":
+    # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
