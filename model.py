@@ -45,9 +45,9 @@ class Studentas(Base):
     studijos = relationship("Studijos", back_populates="studentai")
 
     def __repr__(self):
-        return f"{self.id}, {self.vardas}, {self.pavarde}, {self.asm_kodas}, {self.el_pastas}, {self.mobilus}"
+        return f"{self.id}, {self.vardas}, {self.pavarde}, {self.asm_kodas}, {self.el_pastas}, {self.mobilus}, {self.studijos}"
 
 
 if __name__ == "__main__":
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
