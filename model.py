@@ -5,8 +5,6 @@ from sqlalchemy.orm import relationship
 engine = create_engine('sqlite:///data/mokyklos_studentai.db')
 Base = declarative_base()
 
-
-
 class Mokykla(Base):
     __tablename__ = "mokykla"
     id = Column(Integer, primary_key=True)
@@ -14,7 +12,6 @@ class Mokykla(Base):
     imones_kodas = Column("imones_kodas", Integer, unique=True, nullable=False)
     pvm_kodas = Column("pvm_kodas", String)
     adresas = Column("adresas", String)
-    # studentai = relationship("Studentas", back_populates="mokyklos")
     studijos = relationship("Studijos", back_populates="mokykla")
 
     def __repr__(self):
