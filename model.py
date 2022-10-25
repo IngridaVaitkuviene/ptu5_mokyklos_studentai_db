@@ -23,6 +23,7 @@ class Studijos(Base):
     programos_pavadinimas = Column("programa", String)
     trukme = Column("trukme", String)
     kaina = Column("kaina", Float)
+    mokykla_id = Column("mokykla_id", Integer, ForeignKey("mokykla.id"))
     studentai = relationship("Studentas", back_populates="studijos")
 
     def __repr__(self):
